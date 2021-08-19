@@ -9,12 +9,6 @@ import UIKit
 
 class DetailViewController: UIViewController {
     
-    // MARK: - Constants
-
-    // Constants for Storyboard/ViewControllers.
-    private static let storyboardName = "MainStoryboard"
-    private static let viewControllerIdentifier = "DetailViewController"
-    
     // Constants for state restoration.
     private static let restoreProduct = "restoreProductKey"
     
@@ -28,10 +22,10 @@ class DetailViewController: UIViewController {
     // MARK: - Initialization
     
     class func detailViewControllerForProduct(_ product: Product) -> UIViewController {
-        let storyboard = UIStoryboard(name: DetailViewController.storyboardName, bundle: nil)
+        let storyboard = UIStoryboard(name: "MainStoryboard", bundle: nil)
 
         let viewController =
-			storyboard.instantiateViewController(withIdentifier: DetailViewController.viewControllerIdentifier)
+			storyboard.instantiateViewController(withIdentifier: "DetailViewController")
 		
 		if let detailViewController = viewController as? DetailViewController {
         	detailViewController.product = product
@@ -45,10 +39,6 @@ class DetailViewController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
 
-        if #available(iOS 11.0, *) {
-            self.navigationItem.largeTitleDisplayMode = .never
-        }
-        
         title = product.title
         
         yearLabel.text = "\(product.yearIntroduced)"

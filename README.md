@@ -12,34 +12,34 @@ This sample includes the optional—but recommended—[`UIStateRestoring`](https
 
 Use `MainTableViewController`, a subclass of [`UITableViewController`](https://developer.apple.com/documentation/uikit/uitableviewcontroller), to create a search controller. The search controller searches and filters a set of `Product` objects and displays them in a table called `ResultsTableController`. This table controller is displayed as the user enters a search string and is dismissed when the search is complete.
 
-There are two ways to create the search controller in `MainTableViewController`, depending on the iOS version.  In iOS 10 and earlier, you place it inside the table view's header.  In iOS 11 and later, you place it in the view controller's navigation bar.
-
 ``` swift
 override func viewDidLoad() {
     super.viewDidLoad()
 
-    resultsTableController = ResultsTableController()
-
+    let nib = UINib(nibName: "TableCell", bundle: nil)
+    tableView.register(nib, forCellReuseIdentifier: tableViewCellIdentifier)
+    
+    resultsTableController =
+        self.storyboard?.instantiateViewController(withIdentifier: "ResultsTableController") as? ResultsTableController
+    // This view controller is interested in table view row selections.
     resultsTableController.tableView.delegate = self
     
     searchController = UISearchController(searchResultsController: resultsTableController)
+    searchController.delegate = self
     searchController.searchResultsUpdater = self
     searchController.searchBar.autocapitalizationType = .none
-    
-    if #available(iOS 11.0, *) {
-        // For iOS 11 and later, place the search bar in the navigation bar.
-        navigationItem.searchController = searchController
-        
-        // Make the search bar always visible.
-        navigationItem.hidesSearchBarWhenScrolling = false
-    } else {
-        // For iOS 10 and earlier, place the search controller's search bar in the table view's header.
-        tableView.tableHeaderView = searchController.searchBar
-    }
-
-    searchController.delegate = self
-    searchController.dimsBackgroundDuringPresentation = false // The default is true.
     searchController.searchBar.delegate = self // Monitor when the search button is tapped.
+    
+    searchController.searchBar.scopeButtonTitles = [Product.productTypeName(forType: .all),
+                                                    Product.productTypeName(forType: .birthdays),
+                                                    Product.productTypeName(forType: .weddings),
+                                                    Product.productTypeName(forType: .funerals)]
+
+    // Place the search bar in the navigation bar.
+    navigationItem.searchController = searchController
+    
+    // Make the search bar always visible.
+    navigationItem.hidesSearchBarWhenScrolling = false
     
     /** Search presents a view controller by applying normal view controller presentation semantics.
         This means that the presentation moves up the view controller hierarchy until it finds the root
@@ -50,12 +50,14 @@ override func viewDidLoad() {
         The search controller should be presented modally and match the physical size of this view controller.
     */
     definesPresentationContext = true
+    
+    setupDataSource()
 }
 ```
 
 ## Update the Search Results
 
-This sample uses the [`UISearchResultsUpdating`](https://developer.apple.com/documentation/uikit/uisearchresultsupdating) protocol, along with [`NSComparisonPredicate`](https://developer.apple.com/documentation/foundation/nscomparisonpredicate), to filter out search results from the group of available products. `NSComparisonPredicate` is a foundation class that specifies how data should be fetched or filtered using search criteria. The search criteria are based on what the user types in the search bar, which can be a combination of product title, year introduced, and price.
+This sample uses the [`UISearchResultsUpdating`](https://developer.apple.com/documentation/uikit/uisearchresultsupdating) protocol, along with [`NSComparisonPredicate`](https://developer.apple.com/documentation/foundation/nscomparisonpredicate), to filter search results from the group of available products. `NSComparisonPredicate` is a foundation class that specifies how data should be fetched or filtered using search criteria. The search criteria are based on what the user types in the search bar, which can be a combination of product title, year introduced, and price.
 
 To prepare for a search, the search bar content is trimmed of all leading and trailing space characters. Then the search string is passed to the `findMatches` function, which returns the `NSComparisonPredicate` used in the search. The product list results are applied to the search results table as a filtered list.
 
@@ -85,6 +87,11 @@ func updateSearchResults(for searchController: UISearchController) {
        if let resultsController = searchController.searchResultsController as? ResultsTableController {
            resultsController.filteredProducts = filteredResults
            resultsController.tableView.reloadData()
+
+           resultsController.resultsLabel.text = resultsController.filteredProducts.isEmpty ?
+               NSLocalizedString("NoItemsFoundTitle", comment: "") :
+               String(format: NSLocalizedString("Items found: %ld", comment: ""),
+                      resultsController.filteredProducts.count)
        }
    }
 ```
