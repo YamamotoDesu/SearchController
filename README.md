@@ -2,6 +2,8 @@
 
 Create a user interface with searchable content in a table view.
 
+![RocketSim_Recording_iPhone_12_2022-06-05_14 52 46](https://user-images.githubusercontent.com/47273077/172037367-25ec3eab-cdbe-477c-a03f-a6c3e4e91383.gif)
+
 ## Overview
 
 This sample demonstrates how to create a table view controller and search controller to manage the display of searchable content. It creates another custom table view controller to display the search results. This table view controller also acts as the presenter or provides context for the search results so they're presented within their own context.
