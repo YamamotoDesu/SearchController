@@ -1,4 +1,4 @@
-# Displaying Searchable Content by Using a Search Controller
+# [Displaying Searchable Content by Using a Search Controller](https://developer.apple.com/documentation/uikit/view_controllers/displaying_searchable_content_by_using_a_search_controller#//apple_ref/doc/uid/TP40014683)
 
 Create a user interface with searchable content in a table view.
 
